@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import ApolloProviderWrapper from "@/components/ApolloProvider";
 
 
 export const metadata: Metadata = {
@@ -13,8 +14,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <ApolloProviderWrapper>
     <html lang="en">
+     
       <body className="min-h-screen flex">{children}</body>
+      
     </html>
+    </ApolloProviderWrapper>
   );
 }
