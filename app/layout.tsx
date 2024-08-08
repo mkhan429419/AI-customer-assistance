@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ApolloProviderWrapper from "@/components/ApolloProvider";
+import { Toaster } from "sonner";
 
 
 export const metadata: Metadata = {
@@ -13,13 +14,17 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <ApolloProviderWrapper>
+  return ( 
+   
     <html lang="en">
-     
-      <body className="min-h-screen flex">{children}</body>
+   
+      <body className="min-h-screen flex">
+      <ApolloProviderWrapper>{children}
+        <Toaster position="bottom-center"/>
+      </ApolloProviderWrapper>
+      </body>
       
     </html>
-    </ApolloProviderWrapper>
+   
   );
 }
