@@ -13,13 +13,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <ApolloProviderWrapper>
+  return ( 
+   
     <html lang="en">
-     
-      <body className="min-h-screen flex">{children}</body>
+   
+      <body className="min-h-screen flex">
+      <ApolloProviderWrapper>{children}
+      </ApolloProviderWrapper>
+      </body>
       
     </html>
-    </ApolloProviderWrapper>
+   
   );
 }
