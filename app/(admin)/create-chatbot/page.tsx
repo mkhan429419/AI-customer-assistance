@@ -24,7 +24,7 @@ const CreateChatbot = () => {
     try{
      const data= await createChatbot()
     setName("")
-    router.push(`/admin/chatbot/${data.data.insertChatbots.id}`)}
+    router.push(`/edit-chatbot/${data.data.insertChatbots.id}`)}
     catch(error){
       console.log(error)
     }

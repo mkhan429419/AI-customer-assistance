@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ApolloProviderWrapper from "@/components/ApolloProvider";
+import { Toaster } from "sonner";
 
 
 export const metadata: Metadata = {
@@ -19,6 +20,7 @@ export default function RootLayout({
    
       <body className="min-h-screen flex">
       <ApolloProviderWrapper>{children}
+        <Toaster position="bottom-center"/>
       </ApolloProviderWrapper>
       </body>
       
