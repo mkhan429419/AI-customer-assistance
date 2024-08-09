@@ -1,4 +1,5 @@
 "use client";
+import { ADD_CHARACTERISTIC, DELETE_CHATBOT } from "@/app/api/graphql/mutations/mutations";
 import { GET_CHATBOT_BY_ID } from "@/app/api/graphql/queries/queries";
 import Avatar from "@/components/Avatar";
 import Characteristic from "@/components/Characteristic";
@@ -6,8 +7,9 @@ import { BASE_URL } from "@/components/graphql/apolloCient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GetChatbotByIdResponse, GetChatbotByIdVariables } from "@/types/types";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { Copy } from "lucide-react";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -16,6 +18,13 @@ const EditChatbot = ({ params: {id} }: { params: { id: string } }) => {
   const [url, setUrl] = useState("");
   const [chatbotName, setChatbotName]=useState<string>("")
   const [newCharacteristic, setNewCharacteristic]=useState<string>("")
+  const [deleteChatbot]=useMutation(DELETE_CHATBOT,{
+    refetchQueries:["GetChatbotById"],
+    awaitRefetchQueries:true
+  })
+  const [addCharacteristic]=useMutation(ADD_CHARACTERISTIC,{
+    refetchQueries:["GetChatbotById"],
+  })
 
   const{data,loading,error}=useQuery<GetChatbotByIdResponse, GetChatbotByIdVariables>(GET_CHATBOT_BY_ID,{
     variables:{id}
@@ -30,6 +39,58 @@ const EditChatbot = ({ params: {id} }: { params: { id: string } }) => {
     const url = `${BASE_URL}/chatbot/${id}`;
     setUrl(url);
   }, [id]);
+
+  const handleDelete=async(id: string)=>{
+    const isConfirmed=window.confirm("Are you sure you want to delete this chatbot?");
+    if(!isConfirmed) return;
+
+    try{
+        const promise = deleteChatbot({variables:{id}});
+        toast.promise(promise,{
+            loading:"Deleting...",
+            success:"Chatbot deleted",
+            error:"Failed to delete Chatbot"
+        })
+    }catch(e){
+        console.error(e)
+        toast.error("Failed to delete chatbot")
+  }}
+
+  const handleAddCharacteristic=async(newCharacteristic: string)=>{
+    try{
+      const promise= addCharacteristic({
+        variables:{
+          chatbotId: id,
+          content: newCharacteristic,
+          created_at: new Date().toISOString() 
+        }
+      })
+      toast.promise(promise,{
+        loading:"Adding...",
+        success:"Characteristic added",
+        error:"Failed to add Characteristic"
+      })
+    }catch(e){
+      console.error(e)
+      toast.error("Failed to add characteristic")
+    } 
+  }
+
+  if(loading){
+    return(
+      <div className="mx-auto animate-spin p-10">
+        <Avatar seed="loading"/>
+      </div>
+    )
+  }
+
+  if(error){
+    return <p>Error: {error.message}</p>
+
+  }
+  if(!data?.chatbots){
+    redirect("/edit-chatbot")
+  }
   return (
     <div className="px-0 md:p-10">
       <div className="md:sticky md:top-0 z-50 sm:max-w-sm ml-auto space-y-2 md:border p-5 rounded-b-lg md:rounded-lg bg-[#2991EE]">
@@ -61,7 +122,8 @@ const EditChatbot = ({ params: {id} }: { params: { id: string } }) => {
 
       </div>
       <section className="relative mt-5 bg-white p-5 md:p-10 rounded-lg">
-        <Button variant="destructive" className="absolute top-2 right-2 h-8 w-2">X</Button>
+        <Button variant="destructive" className="absolute top-2 right-2 h-8 w-2"
+        onClick={()=>handleDelete(id)}>X</Button>
         <div className="flex space-x-4">
           <Avatar seed={chatbotName}/>
           <form 
@@ -81,8 +143,16 @@ const EditChatbot = ({ params: {id} }: { params: { id: string } }) => {
         </div>
         <h2 className="text-xl font-bold mt-10">Heres what your AI knows...</h2>
         <p>Your chatbot with your customers and users</p>
-        <div>
-          <form>
+        <div className="bg-gray-200 p-5 md:p-5 rounded-md mt-5">
+          <form onSubmit={e=>{
+            e.preventDefault();
+            handleAddCharacteristic(newCharacteristic);
+            setNewCharacteristic("")
+          }
+
+          }
+          className="flex space-x-2 mb-5"
+          >
             <Input 
               type="text"
               placeholder="Example: if customer asks for prices, provide pricing page: www.example.com/pricing"
