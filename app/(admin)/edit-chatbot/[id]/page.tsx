@@ -1,5 +1,5 @@
 "use client";
-import { ADD_CHARACTERISTIC, DELETE_CHATBOT } from "@/app/api/graphql/mutations/mutations";
+import { ADD_CHARACTERISTIC, DELETE_CHATBOT, UPDATE_CHATBOT } from "@/app/api/graphql/mutations/mutations";
 import { GET_CHATBOT_BY_ID } from "@/app/api/graphql/queries/queries";
 import Avatar from "@/components/Avatar";
 import Characteristic from "@/components/Characteristic";
@@ -29,6 +29,10 @@ const EditChatbot = ({ params: {id} }: { params: { id: string } }) => {
   const{data,loading,error}=useQuery<GetChatbotByIdResponse, GetChatbotByIdVariables>(GET_CHATBOT_BY_ID,{
     variables:{id}
   })
+
+  const [updateChatbot]=useMutation(UPDATE_CHATBOT,{
+    refetchQueries:["GetChatbotById"],
+  })  
 
   useEffect(()=>{
     if(data){
@@ -75,6 +79,26 @@ const EditChatbot = ({ params: {id} }: { params: { id: string } }) => {
       toast.error("Failed to add characteristic")
     } 
   }
+
+  const handleUpdateChatbot=async(e: React.FormEvent<HTMLFormElement>)=>{ 
+    e.preventDefault();
+    try{
+      const promise= updateChatbot({
+        variables:{
+          id,
+          name: chatbotName
+        }
+      })
+      toast.promise(promise,{
+        loading:"Updating...",
+        success:"Chatbot name updated",
+        error:"Failed to update Chatbot name"
+      })
+    }catch(e){
+      console.error(e)
+      toast.error("Failed to update chatbot name")
+    }
+   }
 
   if(loading){
     return(
@@ -127,7 +151,7 @@ const EditChatbot = ({ params: {id} }: { params: { id: string } }) => {
         <div className="flex space-x-4">
           <Avatar seed={chatbotName}/>
           <form 
-          // onSubmit={handleUpdateChatbot}
+          onSubmit={handleUpdateChatbot}
            className="flex flex-1 space-x-2 items-center">
             <Input
             value={chatbotName}
