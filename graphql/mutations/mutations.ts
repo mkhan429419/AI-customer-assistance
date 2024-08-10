@@ -32,8 +32,16 @@ export const DELETE_CHATBOT = gql`
   }
 `;
 export const ADD_CHARACTERISTIC = gql`
-  mutation AddCharacteristic($chatbotId: Int!, $content: String!,  $created_at: DateTime!) {
-    insertChatbot_characteristics(chatbot_id: $chatbotId, content: $content,  created_at: $created_at) {
+  mutation AddCharacteristic(
+    $chatbotId: Int!
+    $content: String!
+    $created_at: DateTime!
+  ) {
+    insertChatbot_characteristics(
+      chatbot_id: $chatbotId
+      content: $content
+      created_at: $created_at
+    ) {
       id
       content
       created_at
@@ -41,13 +49,64 @@ export const ADD_CHARACTERISTIC = gql`
   }
 `;
 
-export const UPDATE_CHATBOT = gql` 
-  mutation UpdateChatbot($id: Int!, $name: String!) { 
+export const UPDATE_CHATBOT = gql`
+  mutation UpdateChatbot($id: Int!, $name: String!) {
     updateChatbots(id: $id, name: $name) {
       id
       name
       created_at
-      }
-      }
-      
-      `; 
+    }
+  }
+`;
+
+export const INSERT_MESSAGE = gql`
+  mutation InsertMessage(
+    $chat_session_id: Int!
+    $content: String!
+    $sender: String!
+    $created_at: DateTime!
+  ) {
+    insertMessages(
+      chat_session_id: $chat_session_id
+      content: $content
+      sender: $sender
+      created_at: $created_at
+    ) {
+      id
+      content
+      created_at
+      sender
+      __typename
+    }
+  }
+`;
+
+export const INSERT_GUEST = gql`
+  mutation insertGuest(
+    $name: String!
+    $email: String!
+    $created_at: DateTime!
+  ) {
+    insertGuests(name: $name, email: $email, created_at: $created_at) {
+      id
+      __typename
+    }
+  }
+`;
+
+export const INSERT_CHAT_SESSION = gql`
+  mutation insertChatSession(
+    $chatbot_id: Int!
+    $guest_id: Int!
+    $created_at: DateTime!
+  ) {
+    insertChat_sessions(
+      chatbot_id: $chatbot_id
+      guest_id: $guest_id
+      created_at: $created_at
+    ) {
+      id
+      __typename
+    }
+  }
+`;
